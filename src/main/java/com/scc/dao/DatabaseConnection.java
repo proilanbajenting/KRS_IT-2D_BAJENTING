@@ -7,7 +7,7 @@ import java.sql.Statement;
 
 public class DatabaseConnection {
 
-    private static final String DB_URL = "jdbc:sqlite:SchoolClassroom.db";
+    private static final String DB_URL = "jdbc:sqlite:karaokerentalrecord.db";
 
 
     public static Connection getConnection()   throws SQLException{
