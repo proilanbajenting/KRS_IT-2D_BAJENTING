@@ -44,6 +44,23 @@ public class UserDao {
         }
     }
 
+    public boolean addUserByAdmin(String username, String password, String role, String status) {
+        String sql = "INSERT INTO users (username, password, roles, status) VALUES (?, ?, ?, ?)";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, username);
+            pstmt.setString(2, password);
+            pstmt.setString(3, role.toUpperCase());
+            pstmt.setString(4, status.toUpperCase());
+            pstmt.executeUpdate();
+            System.out.println("\n[✔] User added successfully by Admin!");
+            return true;
+        } catch (SQLException e) {
+            System.out.println("\n[!] Failed to add user: " + e.getMessage());
+            return false;
+        }
+    }
+
     public user login(String username, String password) {
         String sql = "SELECT id, username, roles, status FROM users WHERE username = ? AND password = ?";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -145,6 +162,24 @@ public class UserDao {
             }
         } catch (SQLException e) {
             System.out.println("Error updating user: " + e.getMessage());
+        }
+        return false;
+    }
+
+    public boolean deleteUser(int userId) {
+        String sql = "DELETE FROM users WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, userId);
+            int rows = pstmt.executeUpdate();
+            if (rows > 0) {
+                System.out.println("\n[✔] User ID " + userId + " deleted successfully!");
+                return true;
+            } else {
+                System.out.println("\n[!] User ID not found.");
+            }
+        } catch (SQLException e) {
+            System.out.println("Error deleting user: " + e.getMessage());
         }
         return false;
     }

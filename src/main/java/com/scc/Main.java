@@ -9,7 +9,7 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) {
-        DatabaseInitializer.initialize(); // 1. Initialize tables & default admin
+        DatabaseInitializer.initialize(); // Initialize tables & seed admin
 
         Scanner scanner = new Scanner(System.in);
         UserDao userDao = new UserDao();

@@ -1,5 +1,6 @@
 package com.scc.ui;
 
+import com.scc.dao.RentalDao;
 import com.scc.dao.UserDao;
 import com.scc.model.user;
 
@@ -7,21 +8,24 @@ import java.util.Scanner;
 
 public class Authentication {
     private final UserDao userDao;
+    private final RentalDao rentalDao;
     private final Scanner scanner;
 
     public Authentication(UserDao userDao, Scanner scanner) {
         this.userDao = userDao;
+        this.rentalDao = new RentalDao();
         this.scanner = scanner;
     }
 
     public void start() {
         while (true) {
-            System.out.println("\n=======================================");
-            System.out.println("     KARAOKE RENTAL SYSTEM (IT2D)      ");
-            System.out.println("=======================================");
-            System.out.println("1. Login");
-            System.out.println("2. Register New Account");
-            System.out.println("3. Exit");
+            System.out.println("\n==================================================");
+            System.out.println("       🎵 KARAOKE RENTAL SYSTEM (IT2D) 🎵       ");
+            System.out.println("==================================================");
+            System.out.println(" 1. Login");
+            System.out.println(" 2. Register New Account");
+            System.out.println(" 3. Exit");
+            System.out.println("==================================================");
             System.out.print("Select an option (1-3): ");
 
             String choice = scanner.nextLine();
@@ -33,15 +37,16 @@ public class Authentication {
                     handleRegister();
                     break;
                 case "3":
-                    System.out.println("Exiting system. Goodbye!");
+                    System.out.println("\nThank you for using Karaoke Rental System. Goodbye!");
                     return;
                 default:
-                    System.out.println("[!] Invalid option! Please enter 1, 2, or 3.");
+                    System.out.println("\n[!] Invalid option! Please enter 1, 2, or 3.");
             }
         }
     }
 
     private void handleLogin() {
+        System.out.println("\n--- SYSTEM LOGIN ---");
         System.out.print("Enter Username: ");
         String username = scanner.nextLine();
         System.out.print("Enter Password: ");
@@ -49,12 +54,13 @@ public class Authentication {
 
         user user = userDao.login(username, password);
         if (user != null) {
-            System.out.println("\nWelcome, " + user.username() + "!");
+            System.out.println("\n[✔] Welcome back, " + user.username() + "!");
             if ("ADMIN".equalsIgnoreCase(user.roles())) {
-                AdminMenu adminMenu = new AdminMenu(user, userDao, scanner);
+                AdminMenu adminMenu = new AdminMenu(user, userDao, rentalDao, scanner);
                 adminMenu.display();
             } else {
-                System.out.println("Standard user dashboard not implemented yet.");
+                UserMenu userMenu = new UserMenu(user, rentalDao, scanner);
+                userMenu.display();
             }
         }
     }
@@ -62,12 +68,23 @@ public class Authentication {
     private void handleRegister() {
         System.out.println("\n--- USER REGISTRATION ---");
         System.out.print("Choose Username: ");
-        String username = scanner.nextLine();
+        String username = scanner.nextLine().trim();
         System.out.print("Choose Password: ");
-        String password = scanner.nextLine();
-        System.out.print("Enter Role (STUDENT, TEACHER, ADMIN): ");
-        String role = scanner.nextLine().toUpperCase();
+        String password = scanner.nextLine().trim();
+
+        String role = readValidRole();
 
         userDao.registerUser(username, password, role);
+    }
+
+    private String readValidRole() {
+        while (true) {
+            System.out.print("Enter Role (CUSTOMER, STAFF, ADMIN): ");
+            String role = scanner.nextLine().trim().toUpperCase();
+            if (role.equals("CUSTOMER") || role.equals("STAFF") || role.equals("ADMIN")) {
+                return role;
+            }
+            System.out.println("[!] Invalid role! Please select CUSTOMER, STAFF, or ADMIN.");
+        }
     }
 }
